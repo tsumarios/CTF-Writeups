@@ -1,2 +1,3 @@
 # CTF
-Collection of CTF Writeups
+
+A collection of CTF Writeups.
