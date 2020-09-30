@@ -15,7 +15,7 @@ There is only one task, indicating that we have to get two flags: `user_flag` an
 Let's start this room by running a classic nmap scan:
 
 ```sh
-$ nmap -sC -sV 10.10.26.252
+$ nmap -sC -sV $IP
 
 Starting Nmap 7.80 ( https://nmap.org ) at 2020-08-31 17:09 CEST
 Stats: 0:00:09 elapsed; 0 hosts completed (0 up), 1 undergoing Ping Scan
@@ -53,7 +53,7 @@ Thus, we can guess that a candidate username for an SSH login could be `john`.
 Now let's give a look if the web server provides a `robots.txt` file:
 
 ```
-GET http://10.10.26.252/robots.txt
+GET http://$IP/robots.txt
 
 user-agent: *
 Allow: /
@@ -63,7 +63,7 @@ Allow: /
 We can see the `/uploads` endpoint, so let's investigate about:
 
 ```
-GET http://10.10.26.252/uploads/
+GET http://$IP/uploads/
 
 dict.lst	2020-02-05 14:10	2.0K	 
 manifesto.txt	2020-02-05 13:05	3.0K	 
@@ -77,7 +77,7 @@ The `dict.lst` file seems to contain a password list. Maybe this list could be u
 Before going ahed, let's enumerate directories using Gobuster with the [common.txt](https://github.com/digination/dirbuster-ng/blob/master/wordlists/common.txt) list:
 
 ```sh
-$ gobuster dir --url 10.10.26.252 -w common.txt
+$ gobuster dir --url $IP -w common.txt
 
 ===============================================================
 Gobuster v3.0.1
@@ -102,7 +102,7 @@ by OJ Reeves (@TheColonial) & Christian Mehlmauer (@_FireFart_)
 As we can see, the tool found only two directories: `/secret` and `/uploads`. We already checked the latter, so we can concentrate our analysis on the `/secret` endpoint:
 
 ```
-GET http://10.10.26.252/secret/
+GET http://$IP/secret/
 
 secretKey	2020-02-05 13:41	1.7K
 ```
