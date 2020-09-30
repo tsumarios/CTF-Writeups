@@ -15,7 +15,7 @@ There is only one task, indicating that we have to get two flags: `user_flag` an
 Let's start this room by running a classic nmap scan:
 
 ```sh
-$ nmap -sC -sV $IP
+$ nmap -sC -sV $IP -oN logs/nmap
 
 Starting Nmap 7.80 ( https://nmap.org ) at 2020-08-31 17:09 CEST
 Stats: 0:00:09 elapsed; 0 hosts completed (0 up), 1 undergoing Ping Scan
