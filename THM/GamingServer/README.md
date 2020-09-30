@@ -77,7 +77,7 @@ The `dict.lst` file seems to contain a password list. Maybe this list could be u
 Before going ahed, let's enumerate directories using Gobuster with the [common.txt](https://github.com/digination/dirbuster-ng/blob/master/wordlists/common.txt) list:
 
 ```sh
-$ gobuster dir --url $IP -w common.txt
+$ gobuster dir --url $IP -w common.txt -o logs/gobuster.log
 
 ===============================================================
 Gobuster v3.0.1
