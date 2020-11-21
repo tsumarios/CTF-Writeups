@@ -1,0 +1,4 @@
+/***secret_folder***  (Status: 401) [Size: 460]
+/images               (Status: 301) [Size: 315] [--> http://10.10.162.165/images/]
+/js                   (Status: 301) [Size: 311] [--> http://10.10.162.165/js/]
+/tmp                  (Status: 301) [Size: 312] [--> http://10.10.162.165/tmp/]
